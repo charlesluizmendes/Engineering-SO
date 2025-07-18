@@ -2,7 +2,7 @@
 
 Bootloader simples em Assembly x86 para a disciplina COS773.
 
-**Código fonte:** https://github.com/charlesluizmendes/Architecture/tree/main/Bootloader
+**Código fonte:** https://github.com/charlesluizmendes/Engineering/tree/main/Bootloader
 
 ## Requisitos
 
