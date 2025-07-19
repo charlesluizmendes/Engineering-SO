@@ -33,3 +33,6 @@ make run
 - `kernel.c` - Kernel em C
 - `Makefile` - Script de compilação
 
+## Exemplo
+
+<img width="721" height="464" alt="Captura de tela de 2025-07-19 01-09-04" src="https://github.com/user-attachments/assets/c8297488-e823-46dc-9f00-69e4ba11981d" />
