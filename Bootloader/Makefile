@@ -1,77 +1,47 @@
-# Makefile para Bootloader COS773
-# IMPORTANTE: Linhas de comando devem começar com TAB!
-
-# Variáveis
-AS = as
-LD = ld
+AS   = as
+LD   = ld
+CC   = gcc
 QEMU = qemu-system-i386
-TARGET = bootloader.img
-SOURCE = bootloader.s
-OBJECT = bootloader.o
 
-# Regra principal
-all: $(TARGET)
+CFLAGS = -m32 -ffreestanding -nostdlib -fno-pie -fno-pic
 
-# Compila assembly para objeto
-$(OBJECT): $(SOURCE)
-	$(AS) --32 $(SOURCE) -o $(OBJECT)
+BOOT_SRC = bootloader.s
+BOOT_OBJ = bootloader.o
+BOOT_BIN = bootloader.bin
 
-# Liga objeto para imagem binária
-$(TARGET): $(OBJECT)
-	$(LD) -m elf_i386 -Ttext 0x7c00 --oformat binary -o $(TARGET) $(OBJECT)
-	@echo "✅ Bootloader compilado com sucesso!"
-	@echo "📁 Tamanho: $$(stat -c%s $(TARGET)) bytes"
+KERNEL_SRC = kernel.c
+KERNEL_OBJ = kernel.o
+KERNEL_BIN = kernel.bin
 
-# Testa no QEMU
-test: $(TARGET)
-	@echo "🚀 Iniciando QEMU..."
-	$(QEMU) -fda $(TARGET)
+IMAGE = os.img
 
-# Debug com QEMU
-debug: $(TARGET)
-	@echo "🐛 Iniciando QEMU em modo debug..."
-	@echo "Em outro terminal: gdb -> target remote :1234"
-	$(QEMU) -fda $(TARGET) -s -S
+all: $(IMAGE)
 
-# Informações do arquivo
-info: $(TARGET)
-	@echo "=== INFORMAÇÕES DO BOOTLOADER ==="
-	@echo "Arquivo: $(TARGET)"
-	@echo "Tamanho: $$(stat -c%s $(TARGET)) bytes"
-	@echo "Assinatura de boot (últimos 2 bytes):"
-	@xxd -l 2 -s +510 $(TARGET)
+$(KERNEL_OBJ): $(KERNEL_SRC)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Limpa arquivos gerados
+$(KERNEL_BIN): $(KERNEL_OBJ)
+	$(LD) -m elf_i386 -Ttext 0x1000 -e kmain --oformat binary -o $@ $<
+
+$(BOOT_OBJ): $(BOOT_SRC) $(KERNEL_BIN)
+	@ks=$$(stat -c%s $(KERNEL_BIN)); \
+	sectors=$$(( (ks + 511) / 512 )); \
+	echo "🔢 kernel = $$sectors setor(es)"; \
+	$(AS) --32 --defsym KERNEL_SECTORS=$$sectors $(BOOT_SRC) -o $@
+
+$(BOOT_BIN): $(BOOT_OBJ)
+	$(LD) -m elf_i386 -Ttext 0x7C00 --oformat binary -o $@ $<
+
+$(IMAGE): $(BOOT_BIN) $(KERNEL_BIN)
+	cp $(BOOT_BIN) $@
+	cat $(KERNEL_BIN) >> $@
+	@sz=$$(stat -c%s $@); pad=$$(( (512 - (sz%512)) % 512 )); \
+	if [ $$pad -ne 0 ]; then dd if=/dev/zero bs=$$pad count=1 >> $@ 2>/dev/null; fi
+
+run: $(IMAGE)
+	$(QEMU) -no-reboot -fda $(IMAGE)
+
 clean:
-	@echo "🧹 Limpando arquivos..."
-	rm -f $(OBJECT) $(TARGET)
+	rm -f $(BOOT_OBJ) $(BOOT_BIN) $(KERNEL_OBJ) $(KERNEL_BIN) $(IMAGE)
 
-# Reinstala dependências
-deps:
-	@echo "📦 Instalando dependências..."
-	sudo apt update
-	sudo apt install -y build-essential qemu-system-x86 xxd
-
-# Verifica ferramentas
-check:
-	@echo "🔍 Verificando ferramentas..."
-	@which $(AS) || echo "❌ 'as' não encontrado"
-	@which $(LD) || echo "❌ 'ld' não encontrado" 
-	@which $(QEMU) || echo "❌ 'qemu-system-i386' não encontrado"
-	@which xxd || echo "⚠️  'xxd' não encontrado (opcional)"
-
-# Ajuda
-help:
-	@echo "=== MAKEFILE BOOTLOADER COS773 ==="
-	@echo "Comandos disponíveis:"
-	@echo "  make all    - Compila o bootloader"
-	@echo "  make test   - Testa no QEMU"
-	@echo "  make debug  - Debug com GDB"
-	@echo "  make info   - Mostra informações"
-	@echo "  make clean  - Limpa arquivos"
-	@echo "  make deps   - Instala dependências"
-	@echo "  make check  - Verifica ferramentas"
-	@echo "  make help   - Mostra esta ajuda"
-
-# Declara alvos que não são arquivos
-.PHONY: all test debug info clean deps check help
+.PHONY: all run clean
