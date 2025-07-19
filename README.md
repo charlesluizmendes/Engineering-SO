@@ -20,24 +20,16 @@ make all
 ## Executar
 
 ```bash
-make test
+make run
 ```
 
-## Comandos
+## Sair
 
-- `make all` - Compila o bootloader
-- `make test` - Executa no QEMU
-- `make clean` - Limpa arquivos gerados
-- `make info` - Mostra informações do arquivo
-
-## Como usar
-
-1. Digite qualquer tecla - aparece na tela
-2. Enter - nova linha
-3. ESC - sai do sistema
+- Pressione as teclas Ctrl + Alt + G.
 
 ## Arquivos
 
 - `bootloader.s` - Código fonte
+- `kernel.c` - Kernel em C
 - `Makefile` - Script de compilação
-- `bootloader.img` - Arquivo final (512 bytes)
+
