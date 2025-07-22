@@ -91,3 +91,42 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_explode(void) {
+  char *s;
+  argaddr(0, (uint64*)&s);
+  printf("%s\n", s);  // usa ponteiro diretamente → inseguro
+  return 0;
+}
+
+/*
+uint64
+sys_explode(void) {
+  char *s;
+  char buf[100];
+  argaddr(0, (uint64*)&s);
+
+  if(copyinstr(myproc()->pagetable, buf, (uint64)s, sizeof(buf)) < 0)
+    return -1;
+
+  printf("%s\n", buf);
+  return 0;
+}
+*/
+
+uint64
+sys_trace(void)
+{
+  int mask;
+  
+  argint(0, &mask);
+  
+  // Validação opcional: verificar se a máscara é válida
+  if(mask < 0) {
+    return -1;
+  }
+  
+  myproc()->trace_mask = mask;
+  return 0;
+}

@@ -190,13 +190,14 @@ UPROGS=\
 	$U/_rm\
 	$U/_sh\
 	$U/_stressfs\
+	$U/_trace\
+	$U/_trace1\
+	$U/_trace2\
+	$U/_trace3\
 	$U/_usertests\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
-
-
-
 
 ifeq ($(LAB),syscall)
 UPROGS += \
