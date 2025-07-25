@@ -1,0 +1,34 @@
+1. Execute o seguinte código: unsigned int i = 0x00646c72; printf("H%x Wo%s", 57616, (char *) &i); Qual é a saída?
+
+A saída é: He110 World
+
+Explicação:
+- 57616 em decimal = 0xe110 em hexadecimal
+- i = 0x00646c72 em little-endian na memória fica: 72 6c 64 00
+- Como string: "rld\0" (0x72='r', 0x6c='l', 0x64='d', 0x00='\0')
+- Resultado: H + e110 + Wo + rld = "He110 World"
+
+2. Se o RISC-V fosse big-endian, que valor você definiria para i? Você precisaria alterar 57616?
+
+Para big-endian, i deveria ser 0x726c6400 para obter a mesma string "rld".
+Não precisa mudar 57616, pois a conversão %x funciona independente do endianness.
+
+3. No código printf("x=%d y=%d", 3); o que será impresso após 'y='?
+
+Será impresso um valor indefinido (lixo da memória/stack). Isso acontece porque printf espera 2 argumentos inteiros baseado no format string, mas apenas 1 foi fornecido. O segundo %d lerá um valor aleatório da stack/registrador.
+
+4. Quais registradores contêm argumentos para funções? Por exemplo, qual registrador contém 13 na chamada de main para printf?
+
+No RISC-V, os argumentos são passados nos registradores a0, a1, a2, a3, a4, a5, a6, a7 (em ordem). O valor 13 está no registrador a0 (primeiro argumento).
+
+5. Onde está a chamada para a função f no código assembly para main? Onde está a chamada para g?
+
+Não há chamadas explícitas para f() e g() no assembly de main. O compilador otimizou essas funções usando "inlining" - o código das funções f e g foi incorporado diretamente no código de main, eliminando as chamadas de função.
+
+6. Em que endereço a função printf está localizada?
+
+A função printf está localizada no endereço 0x30.
+
+7. Qual valor está no registrador ra logo após o jal para printf em main?
+
+O registrador ra contém 0x38 (o endereço da próxima instrução após a chamada jal). O registrador ra (return address) sempre contém o endereço da instrução seguinte ao jal, que é PC + 4.
