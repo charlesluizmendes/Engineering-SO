@@ -1,0 +1,31 @@
+1. Em qual arquivo é armazenado o ID do processo em user-space?
+R: O PID é armazenado na struct proc no campo pid, definida em kernel/proc.h. Em user-space, é obtido através da system call getpid().
+
+2. Quais são os valores dos registradores que contêm os argumentos para trace?
+R: No RISC-V, os argumentos das system calls são passados nos registradores a0, a1, a2, etc. Para trace, o argumento (mask) está no registrador a0.
+
+3. Que modificações você fez no Makefile para adicionar $U/_trace?
+R: Adicionei a linha $U/_trace\ na seção UPROGS do Makefile para compilar o programa trace.
+
+4. Inclua aqui o código da sua implementação de sys_trace().
+R: 
+uint64
+sys_trace(void)
+{
+  int mask;
+  
+  argint(0, &mask);
+  
+  if(mask < 0) {
+    return -1;
+  }
+  
+  myproc()->trace_mask = mask;
+  return 0;
+}
+
+5. Como você modificou a função syscall() em kernel/syscall.c?
+R: Adicionei verificação após cada system call para checar se ela deve ser rastreada usando a trace_mask. Se o bit correspondente estiver definido na máscara, imprimo informações sobre a chamada.
+
+6. Por que a implementação deve copiar a trace_mask do processo pai para o filho no fork()?
+R: Para que os processos filhos herdem o comportamento de rastreamento do processo pai, mantendo a funcionalidade ativa em toda a árvore de processos derivados.

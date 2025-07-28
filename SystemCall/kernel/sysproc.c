@@ -92,6 +92,7 @@ sys_uptime(void)
   return xticks;
 }
 
+/*
 uint64
 sys_explode(void) {
   char *s;
@@ -99,8 +100,8 @@ sys_explode(void) {
   printf("%s\n", s);  // usa ponteiro diretamente → inseguro
   return 0;
 }
+*/
 
-/*
 uint64
 sys_explode(void) {
   char *s;
@@ -113,7 +114,7 @@ sys_explode(void) {
   printf("%s\n", buf);
   return 0;
 }
-*/
+
 
 uint64
 sys_trace(void)
