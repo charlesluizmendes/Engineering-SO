@@ -1,17 +1,34 @@
-1. Markfile:
+## Arquivo:
+Markfile
 
-$U/_mmaptest\
+## Codigo:
+```
+$U/_mmaptest
+```
+## Exmplicação:
+Inclui o binário de teste `_mmaptest` no build do userland.
 
-kernel/defs.h:
+---
 
+## Arquivo:
+kernel/defs.h
+
+## Codigo:
+```c
 struct vma;  // Forward declaration for mmap
 void            munmap_vma(struct vma *vma);
 int             mmap_handler(uint64 va, struct vma *vma);
+```
+## Exmplicação:
+Adiciona *forward declaration* de `struct vma` e os protótipos usados pelo suporte a `mmap/munmap` e pelo *page fault handler* ligado a VMA.
 
+---
 
+## Arquivo:
+kernel/fcntj.h
 
-2. kernel/fcntj.h:
-
+## Codigo:
+```c
 #define PROT_READ       0x1
 #define PROT_WRITE      0x2
 #define PROT_EXEC       0x4
@@ -19,18 +36,30 @@ int             mmap_handler(uint64 va, struct vma *vma);
 // mmap flags
 #define MAP_SHARED      0x01
 #define MAP_PRIVATE     0x02
+```
+## Exmplicação:
+Define *flags* de proteção (`PROT_*`) e de mapeamento (`MAP_SHARED`/`MAP_PRIVATE`) para a API de `mmap`.
 
+---
 
+## Arquivo:
+kernel/nenkayout.h
 
-3. kernel/nenkayout.h:
-
+## Codigo:
+```c
 #define MMAPBASE (MAXVA - MMAPSIZE)
 #define MMAPSIZE (128 * PGSIZE) 
+```
+## Exmplicação:
+Reserva uma janela de 128 páginas no topo do espaço de endereços do usuário para mapeamentos `mmap`.
 
+---
 
+## Arquivo:
+kernel/proc.c
 
-4. kernel/proc.c:
-
+## Codigo:
+```c
 #include "sleeplock.h"    // ← Adicionar se não existir
 #include "fs.h"           // ← Adicionar se não existir
 #include "file.h"         // ← Adicionar se não existir
@@ -194,10 +223,17 @@ exit(int status)
   sched();
   panic("zombie exit");
 }
+```
+## Exmplicação:
+Inicializa as VMA do processo na criação, garante limpeza/fechamento dos arquivos mapeados na liberação/saída do processo e persiste páginas compartilhadas (`MAP_SHARED`) no `exit`.
 
+---
 
-5. kernel/proc.h:
+## Arquivo:
+kernel/proc.h
 
+## Codigo:
+```c
 #define NVMA 16
 
 struct vma {
@@ -211,30 +247,46 @@ struct vma {
 };
 
   struct vma vmas[NVMA];        // Virtual memory areas
+```
+## Exmplicação:
+Define a estrutura `vma` e um vetor de até `NVMA` áreas por processo para dar suporte a mapeamentos de arquivos.
 
+---
 
+## Arquivo:
+kernel/syscall.c
 
-6. kernel/syscall.c:
-
+## Codigo:
+```c
 extern uint64 sys_mmap(void);
 extern uint64 sys_munmap(void);
 
 [SYS_mmap]   sys_mmap,
 [SYS_munmap] sys_munmap,
+```
+## Exmplicação:
+Declara e conecta as *syscalls* `mmap` e `munmap` à tabela de *handlers* do kernel.
 
+---
 
+## Arquivo:
+kernel/syscall.h
 
-
-7. kernel/syscall.h:
-
+## Codigo:
+```c
 #define SYS_mmap   22
 #define SYS_munmap 23
+```
+## Exmplicação:
+Atribui números às novas *syscalls*.
 
+---
 
+## Arquivo:
+kernel/sysfile.c
 
-
-8. kernel/sysfile.c:
-
+## Codigo:
+```c
 #include "memlayout.h" 
 
 uint64
@@ -420,7 +472,8 @@ munmap_vma(struct vma *vma)
           iunlock(vma->f->ip);
           
           if (written != bytes_to_write) {
-            printf("munmap_vma: error writing back page at addr %p (wrote %d, expected %d)\n", 
+            printf("munmap_vma: error writing back page at addr %p (wrote %d, expected %d)
+", 
                    (void*)addr, written, (int)bytes_to_write);
           }
         }
@@ -434,12 +487,18 @@ munmap_vma(struct vma *vma)
   fileclose(vma->f);
   vma->used = 0;
 }
+```
+## Exmplicação:
+Implementa `mmap/munmap` no lado do kernel: reserva VMA, verifica permissões, escolhe VA dentro de `[MMAPBASE, MMAPBASE+MMAPSIZE)`, duplica o `file`, escreve de volta dados modificados em `MAP_SHARED` e dá suporte a *unmap* parcial nas pontas.
+`munmap_vma` auxilia a limpeza de uma VMA inteira.
 
+---
 
+## Arquivo:
+kernel/trap.c
 
-
-9.kernel/trap.c:
-
+## Codigo:
+```c
 #include "sleeplock.h"  // DEVE vir antes de file.h
 #include "fs.h"         // DEVE vir antes de file.h (define NDIRECT)
 #include "file.h"       // Agora pode ser incluído
@@ -500,21 +559,27 @@ usertrap(void)
       // This is a mmap page fault
       // Check if it's a write to a read-only mapping
       if (r_scause() == 15 && !(vma->prot & PROT_WRITE)) {
-        printf("usertrap(): unexpected scause 0x%lx pid=%d\n", r_scause(), p->pid);
-        printf("            sepc=0x%lx stval=0x%lx\n", r_sepc(), r_stval());
+        printf("usertrap(): unexpected scause 0x%lx pid=%d
+", r_scause(), p->pid);
+        printf("            sepc=0x%lx stval=0x%lx
+", r_sepc(), r_stval());
         setkilled(p);
       } else if (mmap_handler(va, vma) < 0) {
         setkilled(p);
       }
     } else {
       // Regular page fault - not in any VMA
-      printf("usertrap(): unexpected scause 0x%lx pid=%d\n", r_scause(), p->pid);
-      printf("            sepc=0x%lx stval=0x%lx\n", r_sepc(), r_stval());
+      printf("usertrap(): unexpected scause 0x%lx pid=%d
+", r_scause(), p->pid);
+      printf("            sepc=0x%lx stval=0x%lx
+", r_sepc(), r_stval());
       setkilled(p);
     }
   } else {
-    printf("usertrap(): unexpected scause 0x%lx pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=0x%lx stval=0x%lx\n", r_sepc(), r_stval());
+    printf("usertrap(): unexpected scause 0x%lx pid=%d
+", r_scause(), p->pid);
+    printf("            sepc=0x%lx stval=0x%lx
+", r_sepc(), r_stval());
     setkilled(p);
   }
 
@@ -570,19 +635,39 @@ mmap_handler(uint64 va, struct vma *vma)
   
   return 0;
 }
+```
+## Exmplicação:
+Integra *page faults* de leitura/escrita (13/15) ao mecanismo de `mmap`: localiza a VMA, valida permissões e carrega a página do arquivo sob demanda em `mmap_handler`.
 
+---
 
+## Arquivo:
+user/user.h
 
-10. user/user.h:
-
+## Codigo:
+```c
 void* mmap(void *addr, int len, int prot, int flags, int fd, int offset);
 int munmap(void *addr, int len);
+```
+## Exmplicação:
+Protótipos de *userland* para as novas *syscalls*.
 
-user/usys.pl:
+---
 
+## Arquivo:
+user/usys.pl
+
+## Codigo:
+```c
 entry("mmap");
 entry("munmap");
+```
+## Exmplicação:
+Gera os *stubs* de usuário para `mmap` e `munmap`.
 
 
+# Testes
 
-mmaptest
+```
+$ mmaptest
+```
