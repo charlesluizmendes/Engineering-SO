@@ -431,8 +431,13 @@ Expõe o protótipo de `cow_fault` para que `trap.c` (e outros módulos) possam 
 # Testes
 
 ```
-$ make clean
-$ make qemu
 $ cowtest
+```
+
+![alt text](img/image-1.png)
+
+```
 $ usertests -q
 ```
+
+![alt text](img/image-2.png)
