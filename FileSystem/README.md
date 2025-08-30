@@ -1,32 +1,45 @@
-1. Makefile:
+# Modificações: Symlinks, O_NOFOLLOW e Bloco Duplamente Indireto no xv6 (RISC‑V)
 
-$U/_symlinktest\
+## Arquivo:
+Makefile
 
+## Codigo:
+```
+$U/_symlinktest```
+## Explicação:
+Adiciona o binário/teste `_symlinktest` à lista de programas de usuário para compilar/rodar com o restante do *userland*. O `\` final segue o padrão de continuação de linha do Makefile.
 
+---
 
+## Arquivo:
+kernel/fcntl.h
 
-2. kernel/fcntl.h:
-
-c 
-
+## Codigo:
+```c
 #define O_NOFOLLOW 0x1000
+```
+## Explicação:
+Define a *flag* `O_NOFOLLOW` para `open(2)`. Quando usada, a chamada `open` **não deve seguir** *symlinks* e, em vez disso, abrir o próprio inode de *symlink* (modo somente leitura e sem truncar).
 
+---
 
+## Arquivo:
+kernel/file.h
 
-
-3. kernel/file.h:
-
-c
-
+## Codigo:
+```c
 uint addrs[NDIRECT + 2]; // idem ao dinode
+```
+## Explicação:
+Garante que a estrutura equivalente em memória tenha o mesmo layout de endereços do `dinode` no disco (`NDIRECT` diretos + 2 entradas extras para indireto simples e duplamente indireto).
 
+---
 
+## Arquivo:
+kernel/fs.c
 
-
-4. kernel/fs.c:
-
-c
-
+## Codigo:
+```c
 static uint
 bmap(struct inode *ip, uint bn)
 {
@@ -151,13 +164,17 @@ itrunc(struct inode *ip)
   ip->size = 0;
   iupdate(ip);
 }
+```
+## Explicação:
+Extende `bmap()` para suportar três níveis: direto, indireto simples e **duplamente indireto**. Em dupla indireção, o primeiro nível aponta para blocos *indiretos* (2º nível), que por sua vez apontam para blocos de dados. Em `itrunc()`, libera corretamente todos os blocos: diretos, os `NINDIRECT` do indireto simples e as duas camadas do duplamente indireto, evitando vazamentos de blocos.
 
+---
 
+## Arquivo:
+kernel/fs.h
 
-5. kernel/fs.h:
-
-c
-
+## Codigo:
+```c
 #define NDIRECT    11
 
 define SINDIRECT  (NDIRECT)       // índice do bloco simples-indireto (posição 11)
@@ -175,22 +192,29 @@ struct dinode {
   // 11 diretos, 1 indireto simples, 1 duplamente indireto = 13 entradas
   uint  addrs[NDIRECT + 2];
 };
+```
+## Explicação:
+Reduz `NDIRECT` para 11 e define índices para `SINDIRECT` (indireto simples) e `DINDIRECT` (duplamente indireto), atualizando o limite `MAXFILE` e o layout do `dinode` para `NDIRECT + 2`. *(Observação: a linha `define SINDIRECT` deve ser um `#define`.)*
 
+---
 
+## Arquivo:
+kernel/stat.h
 
-6. kernel/stat.h:
-
-c
-
+## Codigo:
+```c
 #define T_SYMLINK 4
+```
+## Explicação:
+Introduz um novo tipo de inode `T_SYMLINK` para representar *symbolic links* no sistema de arquivos.
 
+---
 
+## Arquivo:
+kernel/syscall.c
 
-
-7. kernel/syscall.c:
-
-c
-
+## Codigo:
+```c
 extern uint64 sys_symlink(void);
 
 [SYS_symlink] sys_symlink
@@ -219,21 +243,29 @@ static uint64 (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_symlink] sys_symlink
 };
+```
+## Explicação:
+Liga a *syscall* `symlink` ao vetor de *handlers* do kernel, adicionando a declaração `extern` e a entrada correspondente na tabela.
 
+---
 
+## Arquivo:
+kernel/syscall.h
 
-8. kernel/syscall.h:
-
-c
-
+## Codigo:
+```c
 #define SYS_symlink 22
+```
+## Explicação:
+Atribui o número **22** para a *syscall* `symlink`, que deve ser consistente entre `syscall.h`, `syscall.c` e o *userland* gerado por `usys.pl`.
 
+---
 
+## Arquivo:
+kernel/sysfile.c
 
-9. kernel/sysfile.c:
-
-c
-
+## Codigo:
+```c
 static struct inode*
 create(char *path, short type, short major, short minor)
 {
@@ -445,28 +477,41 @@ sys_symlink(void)
   end_op();
   return 0;
 }
+```
+## Explicação:
+- `create(...)` passa a aceitar `T_SYMLINK` e mantém a lógica de criação de dir/arquivo.
+- `sys_open(...)` implementa a resolução de *symlinks*: segue em cascata até 10 níveis quando **não** houver `O_NOFOLLOW`, e aplica regras de acesso (sem escrita em diretórios, sem truncar *symlink*).
+- `sys_symlink(target, path)` cria um inode `T_SYMLINK` cujo conteúdo é a *string* alvo, gravada via `writei`.
 
+---
 
+## Arquivo:
+user/user.h
 
-10. user/user.h:
-
-c
-
+## Codigo:
+```c
 int symlink(const char *target, const char *path);
+```
+## Explicação:
+Declara o protótipo da *syscall* de *userland*, tornando-a disponível para programas de usuário.
 
+---
 
+## Arquivo:
+user/usys.pl
 
-11. user/usys.pl:
-
-c
-
+## Codigo:
+```c
 entry("symlink");
+```
+## Explicação:
+Gera automaticamente o *stub* de *userland* para a *syscall* `symlink` durante a construção do sistema.
 
 
+# Testes
 
-
-
-
-bigfile
-usertests -q
-symlinktest
+```
+$ bigfile
+$ usertests -q
+$ symlinktest
+```
