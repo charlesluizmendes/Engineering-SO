@@ -2,13 +2,6 @@
 
 Bootloader simples em Assembly x86 para a disciplina COS773.
 
-## Requisitos
-
-```bash
-sudo apt update
-sudo apt install build-essential qemu-system-x86 gdb xxd
-```
-
 ## Compilar
 
 ```bash
@@ -31,6 +24,6 @@ make run
 - `kernel.c` - Kernel em C
 - `Makefile` - Script de compilação
 
-## Exemplo
+## Resultados
 
 <img width="721" height="464" alt="Captura de tela de 2025-07-19 01-09-04" src="https://github.com/user-attachments/assets/c8297488-e823-46dc-9f00-69e4ba11981d" />

@@ -1,7 +1,8 @@
-1. kernel/riscv.h:
+## Arquivo:
+kernel/riscv.h
 
-c
-
+## Codigo:
+```c
 // Adicionar após as outras funções r_* e ANTES do final do arquivo
 #ifndef __ASSEMBLER__
 static inline uint64
@@ -12,16 +13,18 @@ r_fp()
   return x;
 }
 #endif
+```
 
+## Explicação:
+Cria função inline `r_fp()` para obter o **frame pointer (s0)**, necessário para implementar backtrace.
 
+---
 
+## Arquivo:
+kernel/printf.c
 
-
-
-2. kernel/printf.c:
-
-c
-
+## Codigo:
+```c
 void
 backtrace(void)
 {
@@ -49,10 +52,6 @@ backtrace(void)
   }
 }
 
-Alterar a panic()
-
-c
-
 void
 panic(char *s)
 {
@@ -65,31 +64,35 @@ panic(char *s)
   for(;;)
     ;
 }
+```
 
+## Explicação:
+Implementa função **`backtrace()`** para imprimir endereços de retorno da stack e integra no `panic()` para ajudar na depuração.
 
+---
 
+## Arquivo:
+kernel/defs.h
 
-
-3. kernel/defs.h:
-
-c
-
+## Codigo:
+```c
 // printf.c
 void            printf(char*, ...);
 void            panic(char*) __attribute__((noreturn));
 void            printfinit(void);
 void            backtrace(void);  // ADICIONAR ESTA LINHA
+```
 
+## Explicação:
+Adiciona protótipo de `backtrace()`.
 
+---
 
+## Arquivo:
+kernel/sysproc.c
 
-
-4. kernel/sysproc.c:
-
-Alterar sys_sleep:
-
-c
-
+## Codigo:
+```c
 uint64
 sys_sleep(void)
 {
@@ -113,8 +116,6 @@ sys_sleep(void)
   release(&tickslock);
   return 0;
 }
-
-c
 
 uint64
 sys_sigalarm(void)
@@ -147,31 +148,35 @@ sys_sigreturn(void)
   
   return 0;
 }
+```
 
+## Explicação:
+- `sys_sleep` agora chama `backtrace()` para demonstrar uso.
+- Implementa syscalls **`sigalarm(interval, handler)`** e **`sigreturn()`** para alarmes baseados em ticks.
 
+---
 
+## Arquivo:
+kernel/syscall.h
 
-
-
-5. kernel/syscall.h:
-
-c
-
+## Codigo:
+```c
 #define SYS_sigalarm 22
 #define SYS_sigreturn 23
+```
 
+## Explicação:
+Define números das novas syscalls.
 
+---
 
+## Arquivo:
+kernel/syscall.c
 
-
-6. kernel/syscall.c:
-
-c
-
+## Codigo:
+```c
 extern uint64 sys_sigalarm(void);
 extern uint64 sys_sigreturn(void);
-
-c
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -198,103 +203,65 @@ static uint64 (*syscalls[])(void) = {
 [SYS_sigalarm] sys_sigalarm,    // ADICIONAR
 [SYS_sigreturn] sys_sigreturn,  // ADICIONAR
 };
+```
 
+## Explicação:
+Registra `sigalarm` e `sigreturn` no vetor de syscalls.
 
+---
 
+## Arquivo:
+user/usys.pl
 
-
-
-
-7. user/usys.pl:
-
-c
-
+## Codigo:
+```c
 entry("sigalarm");
 entry("sigreturn");
+```
 
+## Explicação:
+Cria *stubs* de usuário para `sigalarm` e `sigreturn`.
 
+---
 
+## Arquivo:
+user/user.h
 
-
-
-8. user/user.h:
-
-c
-
+## Codigo:
+```c
 int sigalarm(int ticks, void (*handler)());
 int sigreturn(void);
+```
 
+## Explicação:
+Protótipos para chamadas de usuário.
 
+---
 
+## Arquivo:
+kernel/proc.h
 
-
-
-9. kernel/proc.h:
-
-N função struct proc:
-
-c
-
+## Codigo:
+```c
 // ADICIONAR CAMPOS DO ALARM:
-  int alarm_interval;          // Alarm interval in ticks
-  void (*alarm_handler)();     // Alarm handler function
-  int alarm_ticks;            // Ticks since last alarm
-  struct trapframe *alarm_trapframe; // Saved trapframe for alarm
-  int alarm_active;           // Whether alarm is currently active
+int alarm_interval;          // Alarm interval in ticks
+void (*alarm_handler)();     // Alarm handler function
+int alarm_ticks;             // Ticks since last alarm
+struct trapframe *alarm_trapframe; // Saved trapframe for alarm
+int alarm_active;            // Whether alarm is currently active
+```
 
+## Explicação:
+Novos campos na `struct proc` para suportar alarmes por processo.
 
+---
 
+## Arquivo:
+kernel/proc.c
 
-
-
-
-
-10. kernel/proc.c:
-
-Na allocproc(void):
-
-c
-
-static struct proc*
-allocproc(void)
-{
-  struct proc *p;
-
-  for(p = proc; p < &proc[NPROC]; p++) {
-    acquire(&p->lock);
-    if(p->state == UNUSED) {
-      goto found;
-    } else {
-      release(&p->lock);
-    }
-  }
-  return 0;
-
-found:
-  p->pid = allocpid();
-  p->state = USED;
-
-  // Allocate a trapframe page.
-  if((p->trapframe = (struct trapframe *)kalloc()) == 0){
-    freeproc(p);
-    release(&p->lock);
-    return 0;
-  }
-
-  // An empty user page table.
-  p->pagetable = proc_pagetable(p);
-  if(p->pagetable == 0){
-    freeproc(p);
-    release(&p->lock);
-    return 0;
-  }
-
-  // Set up new context to start executing at forkret,
-  // which returns to user space.
-  memset(&p->context, 0, sizeof(p->context));
-  p->context.ra = (uint64)forkret;
-  p->context.sp = p->kstack + PGSIZE;
-
+## Codigo:
+```c
+// Em allocproc(void):
   // ADICIONAR INICIALIZAÇÃO DOS CAMPOS DO ALARM:
   p->alarm_interval = 0;
   p->alarm_handler = 0;
@@ -302,31 +269,7 @@ found:
   p->alarm_trapframe = 0;
   p->alarm_active = 0;
 
-  return p;
-}
-
-Na função freeproc:
-
-c
-
-static void
-freeproc(struct proc *p)
-{
-  if(p->trapframe)
-    kfree((void*)p->trapframe);
-  p->trapframe = 0;
-  if(p->pagetable)
-    proc_freepagetable(p->pagetable, p->sz);
-  p->pagetable = 0;
-  p->sz = 0;
-  p->pid = 0;
-  p->parent = 0;
-  p->name[0] = 0;
-  p->chan = 0;
-  p->killed = 0;
-  p->xstate = 0;
-  p->state = UNUSED;
-  
+// Em freeproc(struct proc *p):
   // ADICIONAR LIMPEZA DOS CAMPOS DO ALARM:
   if(p->alarm_trapframe)
     kfree((void*)p->alarm_trapframe);
@@ -335,64 +278,19 @@ freeproc(struct proc *p)
   p->alarm_handler = 0;
   p->alarm_ticks = 0;
   p->alarm_active = 0;
-}
+```
 
+## Explicação:
+Inicializa e libera memória associada aos alarmes ao criar/destruir processos.
 
+---
 
+## Arquivo:
+kernel/trap.c
 
-
-
-11. kernel/trap.c:
-
-função usertrap e o bloco if(which_dev == 2):
-
-c
-
-void
-usertrap(void)
-{
-  int which_dev = 0;
-
-  if((r_sstatus() & SSTATUS_SPP) != 0)
-    panic("usertrap: not from user mode");
-
-  // send interrupts and exceptions to kerneltrap(),
-  // since we're now in the kernel.
-  w_stvec((uint64)kernelvec);
-
-  struct proc *p = myproc();
-  
-  // save user program counter.
-  p->trapframe->epc = r_sepc();
-  
-  if(r_scause() == 8){
-    // system call
-
-    if(killed(p))
-      exit(-1);
-
-    // sepc points to the ecall instruction,
-    // but we want to return to the next instruction.
-    p->trapframe->epc += 4;
-
-    // an interrupt will change sepc, scause, and sstatus,
-    // so enable only now that we're done with those registers.
-    intr_on();
-
-    syscall();
-  } else if((which_dev = devintr()) != 0){
-    // ok
-  } else {
-    printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
-    killed(p);
-  }
-
-  if(killed(p))
-    exit(-1);
-
-  // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2){
+## Codigo:
+```c
+if(which_dev == 2){
     // ADICIONAR LÓGICA DO ALARM AQUI:
     struct proc *p = myproc();
     
@@ -421,42 +319,42 @@ usertrap(void)
     }
     
     yield();
-  }
-
-end:
-  usertrapret();
 }
+```
+
+## Explicação:
+Durante interrupção de timer (`which_dev==2`), controla ticks e dispara handler de alarme, salvando/restaurando `trapframe`.
+
+---
+
+## Arquivo:
+Makefile
+
+## Codigo:
+```make
+$U/_alarmtest\ 
+```
+
+## Explicação:
+Adiciona programa de usuário `alarmtest` para testar a syscall `sigalarm`.
 
 
 
 
+# Testes
 
-
-12. Mo Makefile:
-
-UPROGS=\
-	$U/_cat\
-	$U/_echo\
-	$U/_forktest\
-	$U/_grep\
-	$U/_init\
-	$U/_kill\
-	$U/_ln\
-	$U/_ls\
-	$U/_mkdir\
-	$U/_rm\
-	$U/_sh\
-	$U/_stressfs\
-	$U/_usertests\
-	$U/_grind\
-	$U/_wc\
-	$U/_zombie\
-	$U/_alarmtest\     # ADICIONAR ESTA LINHA
-
-
-
+```
 make clean
 make qemu
-bttest
-(em outro terminal) addr2line -e kernel/kernel x0000000080001e2c 0x0000000080001d4e 0x0000000080001a70
-alarmtest
+```
+
+No Terminal 1:
+```
+$ addr2line -e kernel/kernel x0000000080001e2c 0x0000000080001d4e 0x0000000080001a70
+```
+
+No Terminal 2 (dentro do xv6):
+```
+$ bttest
+$ alarmtest
+```
