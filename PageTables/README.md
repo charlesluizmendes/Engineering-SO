@@ -1,4 +1,4 @@
-kernel/defs.h:
+1. kernel/defs.h:
 
 c
 
@@ -16,7 +16,7 @@ uint64          uvmalloc_super(pagetable_t, uint64, uint64);
 
 
 
-kernel/kalloc.c:
+2. kernel/kalloc.c:
 
 c
 
@@ -104,7 +104,7 @@ superfree(void *pa)
 
 
 
-kernel/param.h:
+3. kernel/param.h:
 
 c
 
@@ -116,7 +116,7 @@ c
 
 
 
-kernel/memlayout.h:
+4. kernel/memlayout.h:
 
 c
 
@@ -129,7 +129,7 @@ struct usyscall {
 
 
 
-kernel/proc.c:
+5. kernel/proc.c:
 
 Em allocproc(void):
 
@@ -203,7 +203,7 @@ growproc_super(int n)
 
 
 
-kernel/riscv.h:
+6. kernel/riscv.h:
 
 c
 
@@ -214,7 +214,7 @@ c
 
 
 
-Kernel/sysproc.h:
+7. Kernel/sysproc.h:
 
 c
 
@@ -308,7 +308,7 @@ sys_sbrk(void)
 
 
 
-kernel/proc.h:
+8. kernel/proc.h:
 
 c
 
@@ -318,7 +318,7 @@ c
 
 
 
-kernel/vm.c:
+9. kernel/vm.c:
 
 c
 
@@ -668,6 +668,10 @@ map_superpage(pagetable_t pagetable, uint64 va, uint64 pa, int perm)
 
   return 0;
 }
+
+
+
+
 
 
 

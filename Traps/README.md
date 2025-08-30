@@ -1,4 +1,4 @@
-kernel/riscv.h:
+1. kernel/riscv.h:
 
 c
 
@@ -18,7 +18,7 @@ r_fp()
 
 
 
-kernel/printf.c:
+2. kernel/printf.c:
 
 c
 
@@ -70,7 +70,7 @@ panic(char *s)
 
 
 
-kernel/defs.h:
+3. kernel/defs.h:
 
 c
 
@@ -84,7 +84,7 @@ void            backtrace(void);  // ADICIONAR ESTA LINHA
 
 
 
-kernel/sysproc.c:
+4. kernel/sysproc.c:
 
 Alterar sys_sleep:
 
@@ -153,7 +153,7 @@ sys_sigreturn(void)
 
 
 
-kernel/syscall.h:
+5. kernel/syscall.h:
 
 c
 
@@ -164,7 +164,7 @@ c
 
 
 
-kernel/syscall.c:
+6. kernel/syscall.c:
 
 c
 
@@ -205,7 +205,7 @@ static uint64 (*syscalls[])(void) = {
 
 
 
-user/usys.pl:
+7. user/usys.pl:
 
 c
 
@@ -217,7 +217,7 @@ entry("sigreturn");
 
 
 
-user/user.h:
+8. user/user.h:
 
 c
 
@@ -229,7 +229,7 @@ int sigreturn(void);
 
 
 
-kernel/proc.h:
+9. kernel/proc.h:
 
 N função struct proc:
 
@@ -249,7 +249,7 @@ c
 
 
 
-kernel/proc.c:
+10. kernel/proc.c:
 
 Na allocproc(void):
 
@@ -342,7 +342,7 @@ freeproc(struct proc *p)
 
 
 
-kernel/trap.c:
+11. kernel/trap.c:
 
 função usertrap e o bloco if(which_dev == 2):
 
@@ -432,7 +432,7 @@ end:
 
 
 
-Mo Makefile:
+12. Mo Makefile:
 
 UPROGS=\
 	$U/_cat\

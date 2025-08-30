@@ -1,6 +1,6 @@
 1. kenel/bio.c:
 
-#define NBUCKET 13  // Prime number for good hash distribution
+#define NBUCKET 13
 
 struct hashbucket {
   struct spinlock lock;

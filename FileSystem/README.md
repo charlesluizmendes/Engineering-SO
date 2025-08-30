@@ -1,16 +1,31 @@
-Makefile:
+1. Makefile:
 
 $U/_symlinktest\
 
-kernel/fcntl.h:
+
+
+
+2. kernel/fcntl.h:
+
+c 
 
 #define O_NOFOLLOW 0x1000
 
-kernel/file.h:
+
+
+
+3. kernel/file.h:
+
+c
 
 uint addrs[NDIRECT + 2]; // idem ao dinode
 
-kernel/fs.c:
+
+
+
+4. kernel/fs.c:
+
+c
 
 static uint
 bmap(struct inode *ip, uint bn)
@@ -137,7 +152,11 @@ itrunc(struct inode *ip)
   iupdate(ip);
 }
 
-kernel/fs.h:
+
+
+5. kernel/fs.h:
+
+c
 
 #define NDIRECT    11
 
@@ -157,11 +176,20 @@ struct dinode {
   uint  addrs[NDIRECT + 2];
 };
 
-kernel/stat.h:
+
+
+6. kernel/stat.h:
+
+c
 
 #define T_SYMLINK 4
 
-kernel/syscall.c:
+
+
+
+7. kernel/syscall.c:
+
+c
 
 extern uint64 sys_symlink(void);
 
@@ -192,11 +220,19 @@ static uint64 (*syscalls[])(void) = {
 [SYS_symlink] sys_symlink
 };
 
-kernel/syscall.h:
+
+
+8. kernel/syscall.h:
+
+c
 
 #define SYS_symlink 22
 
-kernel/sysfile.c:
+
+
+9. kernel/sysfile.c:
+
+c
 
 static struct inode*
 create(char *path, short type, short major, short minor)
@@ -410,11 +446,19 @@ sys_symlink(void)
   return 0;
 }
 
-user/user.h:
+
+
+10. user/user.h:
+
+c
 
 int symlink(const char *target, const char *path);
 
-user/usys.pl:
+
+
+11. user/usys.pl:
+
+c
 
 entry("symlink");
 

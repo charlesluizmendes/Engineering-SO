@@ -1,6 +1,7 @@
 1. kernel/riscv.h - Adicionar flag COW
 
-// No final do arquivo, após as definições de flags PTE existentes
+c
+
 #define PTE_COW (1L << 8) // COW mapping (usa bit RSW)
 
 
@@ -8,6 +9,8 @@
 
 
 2. kernel/kalloc.c - Sistema de contagem de referência
+
+c
 
 #include "types.h"
 #include "param.h"
@@ -169,6 +172,8 @@ get_ref_count(uint64 pa)
 
 3. kernel/defs.h - Adicionar protótipos das funções
 
+c
+
 // kalloc.c
 void*           kalloc(void);
 void            kfree(void *);
@@ -181,6 +186,8 @@ int             get_ref_count(uint64);  // Nova função
 
 
 4. kernel/vm.c - Modificar uvmcopy() e copyout()
+
+c
 
 // Modifica a função uvmcopy() existente
 int
@@ -316,6 +323,8 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 
 5. kernel/trap.c - Modificar usertrap()
 
+c
+
 // Na função usertrap(), adiciona tratamento para page faults COW
 // Localiza a seção que trata page faults e adiciona:
 
@@ -390,6 +399,8 @@ usertrap(void)
 
 
 6. kernel/defs.h - Adicionar protótipo cow_fault
+
+c
 
 // Na seção de vm.c, adiciona:
 int             cow_fault(pagetable_t, uint64);

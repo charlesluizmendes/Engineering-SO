@@ -1,4 +1,4 @@
-Markfile:
+1. Markfile:
 
 $U/_mmaptest\
 
@@ -9,7 +9,8 @@ void            munmap_vma(struct vma *vma);
 int             mmap_handler(uint64 va, struct vma *vma);
 
 
-kernel/fcntj.h:
+
+2. kernel/fcntj.h:
 
 #define PROT_READ       0x1
 #define PROT_WRITE      0x2
@@ -19,12 +20,16 @@ kernel/fcntj.h:
 #define MAP_SHARED      0x01
 #define MAP_PRIVATE     0x02
 
-kernel/nenkayout.h:
+
+
+3. kernel/nenkayout.h:
 
 #define MMAPBASE (MAXVA - MMAPSIZE)
 #define MMAPSIZE (128 * PGSIZE) 
 
-kernel/proc.c:
+
+
+4. kernel/proc.c:
 
 #include "sleeplock.h"    // ← Adicionar se não existir
 #include "fs.h"           // ← Adicionar se não existir
@@ -191,7 +196,7 @@ exit(int status)
 }
 
 
-kernel/proc.h:
+5. kernel/proc.h:
 
 #define NVMA 16
 
@@ -209,7 +214,7 @@ struct vma {
 
 
 
-kernel/syscall.c:
+6. kernel/syscall.c:
 
 extern uint64 sys_mmap(void);
 extern uint64 sys_munmap(void);
@@ -218,12 +223,17 @@ extern uint64 sys_munmap(void);
 [SYS_munmap] sys_munmap,
 
 
-kernel/syscall.h:
+
+
+7. kernel/syscall.h:
 
 #define SYS_mmap   22
 #define SYS_munmap 23
 
-kernel/sysfile.c:
+
+
+
+8. kernel/sysfile.c:
 
 #include "memlayout.h" 
 
@@ -425,7 +435,10 @@ munmap_vma(struct vma *vma)
   vma->used = 0;
 }
 
-kernel/trap.c:
+
+
+
+9.kernel/trap.c:
 
 #include "sleeplock.h"  // DEVE vir antes de file.h
 #include "fs.h"         // DEVE vir antes de file.h (define NDIRECT)
@@ -558,7 +571,9 @@ mmap_handler(uint64 va, struct vma *vma)
   return 0;
 }
 
-user/user.h:
+
+
+10. user/user.h:
 
 void* mmap(void *addr, int len, int prot, int flags, int fd, int offset);
 int munmap(void *addr, int len);
