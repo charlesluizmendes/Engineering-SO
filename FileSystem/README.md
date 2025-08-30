@@ -5,7 +5,8 @@ Makefile
 
 ## Codigo:
 ```
-$U/_symlinktest```
+$U/_symlinktest
+```
 ## Explicação:
 Adiciona o binário/teste `_symlinktest` à lista de programas de usuário para compilar/rodar com o restante do *userland*. O `\` final segue o padrão de continuação de linha do Makefile.
 
