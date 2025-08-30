@@ -513,6 +513,23 @@ Programa de teste que passa um ponteiro inválido para `explode` — útil para 
 # Testes
 
 ```
-$ attack
+$ trace 32 grep hello README
+$ trace 2147483647 grep hello README
+$ grep hello README
 ```
+
+![alt text](img/image-1.png)
+
+```
+$ trace 2 usertests forkforkfork
+```
+
+![alt text](img/image-2.png)
+
+```
+# attacktest
+```
+
+![alt text](img/image-3.png)
+
 * Se o kernel travar ou reiniciar, o "ataque" funcionou.
