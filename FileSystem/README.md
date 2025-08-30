@@ -513,15 +513,16 @@ Gera automaticamente o *stub* de *userland* para a *syscall* `symlink` durante a
 $ bigfile
 ```
 
-
+![alt text](img/image-1.png)
 
 ```
 $ usertests -q
 ```
 
-
+![alt text](img/image-2.png)
 
 ```
 $ symlinktest
 ```
 
+![alt text](img/image-3.png)

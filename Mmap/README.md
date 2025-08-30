@@ -672,3 +672,4 @@ Gera os *stubs* de usuário para `mmap` e `munmap`.
 $ mmaptest
 ```
 
+![alt text](img/image-1.png)
