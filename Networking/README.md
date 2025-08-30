@@ -1,5 +1,8 @@
-1. kernel/defs.h:
+## Arquivo:
+kernel/defs.h
 
+## Codigo:
+```c
 // pci.c
 void            pci_init();
 
@@ -11,11 +14,17 @@ int             e1000_transmit(char *, int);
 // net.c
 void            netinit(void);
 void            net_rx(char *buf, int len);
+```
+## Exmplicação:
+Adiciona protótipos públicos para inicialização PCI, driver e1000 e primitivas da pilha de rede, permitindo ligação cruzada entre módulos.
 
+---
 
+## Arquivo:
+kernel/e1000.c
 
-2. kernel/e1000.c:
-
+## Codigo:
+```c
 #include "net.h"
 
 int
@@ -103,20 +112,31 @@ e1000_recv(void)
     regs[E1000_RDT] = rdt;
   }
 }
+```
+## Exmplicação:
+Implementa **transmissão** via anel de descritores TX (verifica DD, programa `addr/length/cmd`, avança TDT e libera buffers antigos) e **recepção** iterando descritores RX prontos (DD), entregando frames ao *stack* via `net_rx`, reciclando buffers e atualizando RDT.
 
+---
 
+## Arquivo:
+kernel/main.c
 
-3. kernel/main.c:
-
+## Codigo:
+```c
     netinit();
 
     pci_init();
-    
-    
+```
+## Exmplicação:
+Inicializa a pilha de rede e, em seguida, configura dispositivos PCI (incluindo a NIC e1000) durante o *boot* do kernel.
 
+---
 
-4. kernel/net.c:
+## Arquivo:
+kernel/net.c
 
+## Codigo:
+```c
 // UDP port table
 #define NPORT 16
 struct port {
@@ -316,7 +336,8 @@ ip_rx(char *buf, int len)
   // don't delete this printf; make grade depends on it.
   static int seen_ip = 0;
   if(seen_ip == 0)
-    printf("ip_rx: received an IP packet\n");
+    printf("ip_rx: received an IP packet
+");
   seen_ip = 1;
 
   //
@@ -395,46 +416,61 @@ ip_rx(char *buf, int len)
   
   release(&netlock);
 }
+```
+## Exmplicação:
+Implementa uma mini-pilha UDP no kernel: `netinit` e tabela de portas com fila circular; *syscalls* `bind/unbind/recv` para processos de usuário; e `ip_rx` que demultiplexa pacotes UDP recebidos, empilhando o payload por porta e acordando consumidores.
 
 
+# Testes
 
-TESTE 1
+## Teste 1
 
-Terminal 1 - Para o script de teste Python:
-cd seu_diretorio_do_lab
-python3 nettest.py txone
+Terminal 1:
+```
+$ cd seu_diretorio_do_lab
+$ python3 nettest.py txone
+```
 
-Terminal 2 - Para o xv6:
-make qemu
+Terminal 2 (dentro do xv6):
+```
+$ make qemu
+```
 
 
-
-TESTE 2
+## Teste 2
 
 No Terminal 1:
-python3 nettest.py txone
+```
+$ python3 nettest.py txone
+```
 
 No Terminal 2 (dentro do xv6):
+```
 $ nettest txone
+```
 
 
-
-
-TESTE 3
+## Teste 3
 
 No Terminal 1:
-python3 nettest.py rxone
+```
+$ python3 nettest.py rxone
+```
 
 No Terminal 2 (dentro do xv6):
+```
 $ nettest rxone
+```
 
 
-
-
-TESTE FINAL
+## Teste Final
 
 No Terminal 1:
-python3 nettest.py grade
+```
+$ python3 nettest.py grade
+```
 
 No Terminal 2 (dentro do xv6):
+```
 $ nettest grade
+```

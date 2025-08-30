@@ -1,5 +1,3 @@
-# Modificações: Copy-on-Write (COW) no xv6 (RISC-V)
-
 ## Arquivo:
 kernel/riscv.h
 

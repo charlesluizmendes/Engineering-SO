@@ -1,5 +1,3 @@
-# Modificações: Symlinks, O_NOFOLLOW e Bloco Duplamente Indireto no xv6 (RISC‑V)
-
 ## Arquivo:
 Makefile
 
