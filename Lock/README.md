@@ -235,7 +235,24 @@ Transforma o alocador físico em **listas livres por CPU** com *spinlock* dedica
 
 ```
 $ kalloctest
+```
+
+![alt text](img/image-1.png)
+
+```
 $ usertests sbrkmuch
+```
+
+![alt text](img/image-2.png)
+
+```
 $ bcachetest
+```
+
+![alt text](img/image-3.png)
+
+```
 $ usertests -q
 ```
+
+![alt text](img/image-4.png)

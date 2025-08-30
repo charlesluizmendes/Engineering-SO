@@ -511,6 +511,17 @@ Gera automaticamente o *stub* de *userland* para a *syscall* `symlink` durante a
 
 ```
 $ bigfile
+```
+
+
+
+```
 $ usertests -q
+```
+
+
+
+```
 $ symlinktest
 ```
+

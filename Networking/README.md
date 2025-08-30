@@ -423,45 +423,42 @@ Implementa uma mini-pilha UDP no kernel: `netinit` e tabela de portas com fila c
 
 # Testes
 
+```
+$ cd src/
+```
+
 ## Teste 1
 
 Terminal 1:
 ```
-$ cd seu_diretorio_do_lab
 $ python3 nettest.py txone
 ```
 
+![alt text](img/image-1.png)
+
 Terminal 2 (dentro do xv6):
 ```
-$ make qemu
+$ nettest txone
 ```
+
+![alt text](img/image-2.png)
 
 
 ## Teste 2
 
 No Terminal 1:
 ```
-$ python3 nettest.py txone
-```
-
-No Terminal 2 (dentro do xv6):
-```
-$ nettest txone
-```
-
-
-## Teste 3
-
-No Terminal 1:
-```
 $ python3 nettest.py rxone
 ```
+
+![alt text](img/image-3.png)
 
 No Terminal 2 (dentro do xv6):
 ```
 $ nettest rxone
 ```
 
+![alt text](img/image-4.png)
 
 ## Teste Final
 
@@ -470,7 +467,11 @@ No Terminal 1:
 $ python3 nettest.py grade
 ```
 
+![alt text](img/image-5.png)
+
 No Terminal 2 (dentro do xv6):
 ```
 $ nettest grade
 ```
+
+![alt text](img/image-6.png)
