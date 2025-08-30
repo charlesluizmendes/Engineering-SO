@@ -717,7 +717,7 @@ Adiciona ferramentas de depuração (`vmprint_recursive`) e amplia o **VM** para
 # Testes
 
 ```
-$ make clean
-$ make qemu
 $ pgtbltest
 ```
+
+![alt text](img/image.png)

@@ -343,18 +343,22 @@ Adiciona programa de usuário `alarmtest` para testar a syscall `sigalarm`.
 
 # Testes
 
-```
-make clean
-make qemu
-```
-
-No Terminal 1:
-```
-$ addr2line -e kernel/kernel x0000000080001e2c 0x0000000080001d4e 0x0000000080001a70
-```
-
-No Terminal 2 (dentro do xv6):
+No Terminal 1 (dentro do xv6):
 ```
 $ bttest
+```
+
+![alt text](img/image-1.png)
+
+No Terminal 2:
+```
+$ addr2line -e kernel/kernel 0x0000000080001e2c 0x0000000080001d4e 0x0000000080001a70
+```
+
+![alt text](img/image-2.png)
+
+```
 $ alarmtest
 ```
+
+![alt text](img/image-3.png)
