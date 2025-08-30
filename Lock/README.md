@@ -1,5 +1,8 @@
-1. kenel/bio.c:
+## Arquivo:
+kenel/bio.c
 
+## Codigo:
+```c
 #define NBUCKET 13
 
 struct hashbucket {
@@ -134,10 +137,18 @@ bunpin(struct buf *b)
   b->refcnt--;
   release(&bcache.bucket[bucket_id].lock);
 }
+```
 
+## Exmplicação:
+Refatora o *buffer cache* para usar **NBUCKET** listas encadeadas com *spinlocks* por *bucket*, reduzindo contenção. `bget()` faz *lookup* no *bucket* correto e, na falta, varre os demais para roubar um *buffer* livre (refcnt==0), realocando-o para o *bucket* de destino. `brelse/bpin/bunpin` ajustam `refcnt` protegidos pelo *lock* do *bucket* correspondente. `binit()` inicializa os *buckets* e encadeia os *buffers* no *bucket* 0.
 
-2. kernel/kalloc.c:
+---
 
+## Arquivo:
+kernel/kalloc.c
+
+## Codigo:
+```c
 struct {
   struct spinlock lock;
   struct run *freelist;
@@ -215,3 +226,16 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
 }
+```
+
+## Exmplicação:
+Transforma o alocador físico em **listas livres por CPU** com *spinlock* dedicado, reduzindo contenção e cache-line bouncing em cargas concorrentes. `kalloc()` tenta primeiro o *freelist* local; se vazio, **rouba** de outros CPUs. `kfree()` sempre devolve ao *freelist* do CPU corrente. `push_off()/pop_off()` garantem que a thread não migre entre CPUs enquanto segura (ou depende de) um *freelist* específico.
+
+# Testes
+
+```
+$ kalloctest
+$ usertests sbrkmuch
+$ bcachetest
+$ usertests -q
+```
