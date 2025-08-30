@@ -5,7 +5,7 @@ Markfile
 ```
 $U/_mmaptest
 ```
-## Exmplicação:
+## Explicação:
 Inclui o binário de teste `_mmaptest` no build do userland.
 
 ---
@@ -19,7 +19,7 @@ struct vma;  // Forward declaration for mmap
 void            munmap_vma(struct vma *vma);
 int             mmap_handler(uint64 va, struct vma *vma);
 ```
-## Exmplicação:
+## Explicação:
 Adiciona *forward declaration* de `struct vma` e os protótipos usados pelo suporte a `mmap/munmap` e pelo *page fault handler* ligado a VMA.
 
 ---
@@ -37,7 +37,7 @@ kernel/fcntj.h
 #define MAP_SHARED      0x01
 #define MAP_PRIVATE     0x02
 ```
-## Exmplicação:
+## Explicação:
 Define *flags* de proteção (`PROT_*`) e de mapeamento (`MAP_SHARED`/`MAP_PRIVATE`) para a API de `mmap`.
 
 ---
@@ -50,7 +50,7 @@ kernel/nenkayout.h
 #define MMAPBASE (MAXVA - MMAPSIZE)
 #define MMAPSIZE (128 * PGSIZE) 
 ```
-## Exmplicação:
+## Explicação:
 Reserva uma janela de 128 páginas no topo do espaço de endereços do usuário para mapeamentos `mmap`.
 
 ---
@@ -224,7 +224,7 @@ exit(int status)
   panic("zombie exit");
 }
 ```
-## Exmplicação:
+## Explicação:
 Inicializa as VMA do processo na criação, garante limpeza/fechamento dos arquivos mapeados na liberação/saída do processo e persiste páginas compartilhadas (`MAP_SHARED`) no `exit`.
 
 ---
@@ -248,7 +248,7 @@ struct vma {
 
   struct vma vmas[NVMA];        // Virtual memory areas
 ```
-## Exmplicação:
+## Explicação:
 Define a estrutura `vma` e um vetor de até `NVMA` áreas por processo para dar suporte a mapeamentos de arquivos.
 
 ---
@@ -264,7 +264,7 @@ extern uint64 sys_munmap(void);
 [SYS_mmap]   sys_mmap,
 [SYS_munmap] sys_munmap,
 ```
-## Exmplicação:
+## Explicação:
 Declara e conecta as *syscalls* `mmap` e `munmap` à tabela de *handlers* do kernel.
 
 ---
@@ -277,7 +277,7 @@ kernel/syscall.h
 #define SYS_mmap   22
 #define SYS_munmap 23
 ```
-## Exmplicação:
+## Explicação:
 Atribui números às novas *syscalls*.
 
 ---
@@ -488,7 +488,7 @@ munmap_vma(struct vma *vma)
   vma->used = 0;
 }
 ```
-## Exmplicação:
+## Explicação:
 Implementa `mmap/munmap` no lado do kernel: reserva VMA, verifica permissões, escolhe VA dentro de `[MMAPBASE, MMAPBASE+MMAPSIZE)`, duplica o `file`, escreve de volta dados modificados em `MAP_SHARED` e dá suporte a *unmap* parcial nas pontas.
 `munmap_vma` auxilia a limpeza de uma VMA inteira.
 
@@ -636,7 +636,7 @@ mmap_handler(uint64 va, struct vma *vma)
   return 0;
 }
 ```
-## Exmplicação:
+## Explicação:
 Integra *page faults* de leitura/escrita (13/15) ao mecanismo de `mmap`: localiza a VMA, valida permissões e carrega a página do arquivo sob demanda em `mmap_handler`.
 
 ---
@@ -649,7 +649,7 @@ user/user.h
 void* mmap(void *addr, int len, int prot, int flags, int fd, int offset);
 int munmap(void *addr, int len);
 ```
-## Exmplicação:
+## Explicação:
 Protótipos de *userland* para as novas *syscalls*.
 
 ---
@@ -662,7 +662,7 @@ user/usys.pl
 entry("mmap");
 entry("munmap");
 ```
-## Exmplicação:
+## Explicação:
 Gera os *stubs* de usuário para `mmap` e `munmap`.
 
 

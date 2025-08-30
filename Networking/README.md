@@ -15,7 +15,7 @@ int             e1000_transmit(char *, int);
 void            netinit(void);
 void            net_rx(char *buf, int len);
 ```
-## Exmplicação:
+## Explicação:
 Adiciona protótipos públicos para inicialização PCI, driver e1000 e primitivas da pilha de rede, permitindo ligação cruzada entre módulos.
 
 ---
@@ -113,7 +113,7 @@ e1000_recv(void)
   }
 }
 ```
-## Exmplicação:
+## Explicação:
 Implementa **transmissão** via anel de descritores TX (verifica DD, programa `addr/length/cmd`, avança TDT e libera buffers antigos) e **recepção** iterando descritores RX prontos (DD), entregando frames ao *stack* via `net_rx`, reciclando buffers e atualizando RDT.
 
 ---
@@ -127,7 +127,7 @@ kernel/main.c
 
     pci_init();
 ```
-## Exmplicação:
+## Explicação:
 Inicializa a pilha de rede e, em seguida, configura dispositivos PCI (incluindo a NIC e1000) durante o *boot* do kernel.
 
 ---
@@ -417,7 +417,7 @@ ip_rx(char *buf, int len)
   release(&netlock);
 }
 ```
-## Exmplicação:
+## Explicação:
 Implementa uma mini-pilha UDP no kernel: `netinit` e tabela de portas com fila circular; *syscalls* `bind/unbind/recv` para processos de usuário; e `ip_rx` que demultiplexa pacotes UDP recebidos, empilhando o payload por porta e acordando consumidores.
 
 

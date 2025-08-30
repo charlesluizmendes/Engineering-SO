@@ -14,7 +14,7 @@ int             growproc_super(int);
 int             map_superpage(pagetable_t, uint64, uint64, int);
 uint64          uvmalloc_super(pagetable_t, uint64, uint64);
 ```
-## Exmplicação:
+## Explicação:
 Adiciona protótipos para depuração de TLB/VM (`vmprint`), gerenciamento de **superpages** (2MB) e rotas especializadas de crescimento/allocação de memória de usuário (inclui `map_superpage` e `uvmalloc_super`).
 
 ---
@@ -109,7 +109,7 @@ superfree(void *pa)
   release(&supermem.lock);
 }
 ```
-## Exmplicação:
+## Explicação:
 Cria um **pool de superpages** gerenciado por `supermem` (até 8 regiões de 2MB). `superinit` reserva e alinha fisicamente, `superalloc`/`superfree` gerenciam o pool com logs de depuração.
 
 ---
@@ -121,7 +121,7 @@ kernel/param.h
 ```c
 #define SUPERPAGE_SIZE (2 * 1024 * 1024)  // 2MB
 ```
-## Exmplicação:
+## Explicação:
 Define o tamanho da superpage (2 MiB), usado em alocação e mapeamento.
 
 ---
@@ -137,7 +137,7 @@ struct usyscall {
 };
 #endif
 ```
-## Exmplicação:
+## Explicação:
 Cria uma página de dados **USYSCALL** no espaço do usuário para *fast path* de informações simples (ex.: `pid`).
 
 ---
@@ -202,7 +202,7 @@ growproc_super(int n)
   return 0;
 }
 ```
-## Exmplicação:
+## Explicação:
 Aloca, mapeia e libera a página **USYSCALL** no ciclo de vida do processo. Introduz `growproc_super` para expansão de heap com tentativa de usar superpages.
 
 ---
@@ -214,7 +214,7 @@ kernel/riscv.h
 ```c
 #define PTE_LEAF(pte) (((pte) & PTE_R) | ((pte) & PTE_W) | ((pte) & PTE_X))
 ```
-## Exmplicação:
+## Explicação:
 Macro utilitária para identificar PTEs **folha** (têm R/W/X).
 
 ---
@@ -320,7 +320,7 @@ sys_sbrk(void)
   return addr;
 }
 ```
-## Exmplicação:
+## Explicação:
 Optimiza `sbrk` para **alocações grandes**: alinha ao próximo limite de 2 MB, tenta superpages por blocos e faz *fallback* para páginas normais quando necessário, preservando o comportamento tradicional para alocações pequenas.
 
 ---
@@ -332,7 +332,7 @@ kernel/proc.h
 ```c
   struct usyscall *usyscall;   // ADICIONAR ESTA LINHA - data page for syscall speedup
 ```
-## Exmplicação:
+## Explicação:
 Campo no `struct proc` para apontar para a página **USYSCALL** do processo.
 
 ---
@@ -710,7 +710,7 @@ map_superpage(pagetable_t pagetable, uint64 va, uint64 pa, int perm)
   return 0;
 }
 ```
-## Exmplicação:
+## Explicação:
 Adiciona ferramentas de depuração (`vmprint_recursive`) e amplia o **VM** para lidar com superpages: mudanças em `walk` (reconhecer folhas), `uvmunmap` (liberação de 2 MB em bloco), `uvmcopy` (cópia otimizada quando a origem é superpage), `uvmalloc_super` (alocação híbrida normal/superpage) e `map_superpage` (mapeamento direto no nível 1).
 
 
