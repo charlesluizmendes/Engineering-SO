@@ -1,8 +1,5 @@
 # Trabalho da Disciplina de Engenharia de Sistemas Operacionais
 
-Codigo: COS773
-Professor: Diego Duttra
-
 ## Requisitos
 
 ```bash
@@ -10,38 +7,24 @@ sudo apt update
 sudo apt install build-essential qemu-system-x86 gdb xxd
 ```
 
-## Lab BootLoader
+## Laboratórios
 
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/Bootloader
+Acesse a implementação de cada laboratório:
 
-## Lab SysCall
+[Bootloader](https://github.com/charlesluizmendes/Engineering-SO/tree/main/Bootloader)
 
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/SystemCall
+[SysCall](https://github.com/charlesluizmendes/Engineering-SO/tree/main/SystemCall)
 
-## Lab PageTables
+[PageTables](https://github.com/charlesluizmendes/Engineering-SO/tree/main/PageTables)
 
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/PageTables
+[Traps](https://github.com/charlesluizmendes/Engineering-SO/tree/main/Traps)
 
-## Lab Traps
+[Cow](https://github.com/charlesluizmendes/Engineering-SO/tree/main/Cow)
 
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/Traps
+[Networking](https://github.com/charlesluizmendes/Engineering-SO/tree/main/Networking)
 
-## Lab Cow
+[Lock](https://github.com/charlesluizmendes/Engineering-SO/tree/main/Lock)
 
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/Cow
+[FileSystem](https://github.com/charlesluizmendes/Engineering-SO/tree/main/FileSystem)
 
-## Lab Networking
-
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/Networking
-
-## Lab Lock
-
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/Lock
-
-## Lab FileSystem
-
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/FileSystem
-
-## Lab NMAP
-
-https://github.com/charlesluizmendes/Engineering-SO/tree/main/Mmap
+[NMAP](https://github.com/charlesluizmendes/Engineering-SO/tree/main/Mmap)
