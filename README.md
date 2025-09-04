@@ -7,6 +7,15 @@ sudo apt update
 sudo apt install build-essential qemu-system-x86 gdb xxd
 ```
 
+##
+
+Para executar cada laboratório, basta entrar dentro da pasta correspondente do laboratório e consequentemente na pasta "/src" e executar os comandos:
+
+```bash
+make clean
+make qemu
+```
+
 ## Laboratórios
 
 Acesse a implementação de cada laboratório:
