@@ -184,8 +184,8 @@ kernel/defs.h - Adicionar protótipos das funções
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
-void            inc_ref_count(uint64);  // Nova função
-int             get_ref_count(uint64);  // Nova função
+void            inc_ref_count(uint64);
+int             get_ref_count(uint64);
 ```
 ## Explicação:
 Expõe as novas funções de contagem de referência (`inc_ref_count` e `get_ref_count`) para que outros módulos (ex.: `vm.c`) possam atualizar e consultar o estado de compartilhamento das páginas.
@@ -237,7 +237,6 @@ err:
   return -1;
 }
 
-// Adiciona nova função para lidar com falhas de página COW
 int
 cow_fault(pagetable_t pagetable, uint64 va)
 {
@@ -286,7 +285,6 @@ cow_fault(pagetable_t pagetable, uint64 va)
   return 0;
 }
 
-// Modifica a função copyout() existente
 int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
@@ -339,7 +337,6 @@ kernel/trap.c - Modificar usertrap()
 ## Codigo:
 ```c
 // Na função usertrap(), adiciona tratamento para page faults COW
-// Localiza a seção que trata page faults e adiciona:
 
 void
 usertrap(void)
@@ -421,7 +418,6 @@ kernel/defs.h - Adicionar protótipo cow_fault
 
 ## Codigo:
 ```c
-// Na seção de vm.c, adiciona:
 int             cow_fault(pagetable_t, uint64);
 ```
 ## Explicação:

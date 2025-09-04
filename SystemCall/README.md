@@ -1,3 +1,48 @@
+## Respostas às Perguntas
+
+### 1. Olhando para a saída do backtrace, qual função chama syscall?
+
+Baseando-me no material do laboratório, quando executo `backtrace` no GDB após definir um breakpoint em `syscall`, a função que chama `syscall` é **`usertrap`**. A sequência típica que observo é:
+- `ecall` (instrução de user space)
+- `uservec` (em trampolineS)  
+- `usertrap` (em trap.c)
+- `syscall` (em syscall.c)
+
+### 2. Qual é o valor de p->trapframe->a7 e o que esse valor representa?
+
+O valor de `p->trapframe->a7` que encontro é **7**, que corresponde a `SYS_exec`. Este valor representa o número da system call que está sendo executada.
+
+Observando o arquivo `user/initcode.S`, posso ver que o primeiro programa do usuário no xv6 coloca `SYS_exec` (que é 7) no registrador a7 antes de fazer a chamada `ecall`:
+```assembly
+li a7, SYS_exec
+ecall
+```
+
+### 3. Qual era o modo anterior em que a CPU estava?
+
+O modo anterior da CPU era **user mode**. Posso confirmar isso examinando o registrador `$sstatus` no GDB. O bit SPP (Supervisor Previous Privilege) está em 0, indicando que a CPU estava em user mode antes do trap.
+
+### 4. Escreva a instrução de montagem na qual o kernel está apresentando problemas. Qual registrador corresponde à variável num?
+
+A instrução assembly problemática que identifiquei é: `lw a3,0(zero) # 0`
+
+Esta instrução aparece quando substituo `num = p->trapframe->a7;` por `num = * (int *) 0;` no código. O registrador que corresponde à variável `num` é **a3**.
+
+### 5. Por que o kernel trava?
+
+O kernel trava porque a instrução `lw a3,0(zero)` tenta acessar o endereço de memória 0, que não está mapeado no espaço de endereçamento do kernel. 
+
+Como posso verificar seguindo a dica, observando a figura 3-3 do texto do xv6, o endereço 0 não está mapeado no espaço de endereço do kernel. Isso é confirmado pelo valor de `scause=0xd`, que indica uma page fault (load page fault) de acordo com as instruções privilegiadas do RISC-V.
+
+### 6. Qual é o nome do processo que estava em execução quando o kernel entrou em pânico? Qual é o seu ID de processo (pid)?
+
+O nome do processo em execução que observo é **"initcode"** e seu PID é tipicamente **1**. 
+
+Posso confirmar isso no GDB usando o comando `p p->name` após o kernel entrar em pânico, que me mostra o nome do processo atual.
+
+Essas são as respostas que encontro baseando-me no comportamento padrão do xv6 durante o boot, onde o primeiro processo de usuário (`initcode`) é executado e faz uma chamada para `exec` para iniciar o sistema.
+
+
 ## Arquivo:
 Makefile
 
@@ -15,16 +60,14 @@ kernel/proc.c
 
 ## Codigo:
 ```c
-// na função allocproc(void):
 
 p->context.sp = p->kstack + PGSIZE;
-p->trace_mask = 0; // INSERIR ESSA LINHA AQUI
+p->trace_mask = 0;
 return p;
 
-// Na função fork(void):
 
 safestrcpy(np->name, p->name, sizeof(p->name));
-np->trace_mask = p->trace_mask; // INSERIR ESSA LINHA AQUI
+np->trace_mask = p->trace_mask;
 pid = np->pid;
 ```
 ## Explicação:
@@ -156,7 +199,6 @@ sys_trace(void)
   
   argint(0, &mask);
   
-  // Validação opcional: verificar se a máscara é válida
   if(mask < 0) {
     return -1;
   }
@@ -205,8 +247,6 @@ int main() {
     printf("Iniciando leitura do arquivo README...
 ");
     while((bytes_read = read(fd, buf, sizeof(buf))) > 0) {
-        // Simular processamento (procurar por "hello")
-        // Apenas lendo, o trace vai mostrar as chamadas read
     }
     
     close(fd);
@@ -307,21 +347,18 @@ int main() {
 ");
     int pid1 = fork();
     if(pid1 == 0) {
-        // Processo filho 1
         printf("Filho 1 (PID %d) executando...
 ", getpid());
         
-        // Filho também pode fazer fork (herda o trace_mask)
         printf("Filho 1 criando neto...
 ");
         int pid_neto = fork();
         if(pid_neto == 0) {
-            // Processo neto
             printf("Neto (PID %d) executando e terminando...
 ", getpid());
             exit(0);
         }
-        wait(0); // Esperar o neto
+        wait(0);
         printf("Filho 1 terminando...
 ");
         exit(0);
@@ -332,15 +369,13 @@ int main() {
 ");  
     int pid2 = fork();
     if(pid2 == 0) {
-        // Processo filho 2
         printf("Filho 2 (PID %d) executando e terminando...
 ", getpid());
         exit(0);
     }
     
-    // Processo pai espera pelos filhos
-    wait(0); // Esperar filho 1
-    wait(0); // Esperar filho 2
+    wait(0);
+    wait(0);
     
     printf("
 Teste 3 concluido!
@@ -366,7 +401,6 @@ user/user.h
 
 ## Codigo:
 ```c
-// Declarar esse parâmetro:
 int trace(int);
 ```
 ## Explicação:
@@ -379,7 +413,6 @@ user/usys.pl
 
 ## Codigo:
 ```c
-// Declarar essa entrada:
 entry("trace");
 ```
 ## Explicação:
@@ -417,7 +450,7 @@ sys_explode(void) {
   char *s;
   argaddr(0, (uint64*)&s);
   printf("%s
-", s);  // ⚠️ usa ponteiro diretamente → inseguro
+", s);  // usa ponteiro diretamente → inseguro
   return 0;
 }
 
@@ -432,7 +465,7 @@ sys_explode(void) {
     return -1;
 
   printf("%s
-", buf); // ⚠️ usa ponteiro seguro → correção
+", buf); // usa ponteiro seguro → correção
   return 0;
 }
 */

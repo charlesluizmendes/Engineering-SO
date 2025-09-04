@@ -60,9 +60,9 @@ kernel/proc.c
 
 ## Codigo:
 ```c
-#include "sleeplock.h"    // ← Adicionar se não existir
-#include "fs.h"           // ← Adicionar se não existir
-#include "file.h"         // ← Adicionar se não existir
+#include "sleeplock.h"    
+#include "fs.h"           
+#include "file.h"         
 #include "fcntl.h"   
 
 static struct proc*
@@ -191,7 +191,7 @@ exit(int status)
           }
         }
         
-        end_op();  // Fim da transação
+        end_op();
       }
       
       fileclose(vma->f);
@@ -480,7 +480,7 @@ munmap_vma(struct vma *vma)
       }
     }
     
-    end_op();  // Fim da transação
+    end_op();
   }
 
   // Close file
@@ -499,9 +499,9 @@ kernel/trap.c
 
 ## Codigo:
 ```c
-#include "sleeplock.h"  // DEVE vir antes de file.h
-#include "fs.h"         // DEVE vir antes de file.h (define NDIRECT)
-#include "file.h"       // Agora pode ser incluído
+#include "sleeplock.h"  
+#include "fs.h"         
+#include "file.h"       
 #include "fcntl.h"  
 
 void

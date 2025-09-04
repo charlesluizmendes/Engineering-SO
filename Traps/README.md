@@ -3,7 +3,6 @@ kernel/riscv.h
 
 ## Codigo:
 ```c
-// Adicionar após as outras funções r_* e ANTES do final do arquivo
 #ifndef __ASSEMBLER__
 static inline uint64
 r_fp()
@@ -59,7 +58,7 @@ panic(char *s)
   printf("panic: ");
   printf(s);
   printf("\n");
-  backtrace();  // ADICIONAR ESTA LINHA
+  backtrace();
   panicked = 1; // freeze uart output from other CPUs
   for(;;)
     ;
@@ -80,7 +79,7 @@ kernel/defs.h
 void            printf(char*, ...);
 void            panic(char*) __attribute__((noreturn));
 void            printfinit(void);
-void            backtrace(void);  // ADICIONAR ESTA LINHA
+void            backtrace(void);
 ```
 
 ## Explicação:
@@ -99,7 +98,7 @@ sys_sleep(void)
   int n;
   uint ticks0;
 
-  backtrace();  // ADICIONAR ESTA LINHA
+  backtrace();
 
   argint(0, &n);
   if(n < 0)
@@ -200,8 +199,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_sigalarm] sys_sigalarm,    // ADICIONAR
-[SYS_sigreturn] sys_sigreturn,  // ADICIONAR
+[SYS_sigalarm] sys_sigalarm,
+[SYS_sigreturn] sys_sigreturn,
 };
 ```
 
@@ -243,7 +242,6 @@ kernel/proc.h
 
 ## Codigo:
 ```c
-// ADICIONAR CAMPOS DO ALARM:
 int alarm_interval;          // Alarm interval in ticks
 void (*alarm_handler)();     // Alarm handler function
 int alarm_ticks;             // Ticks since last alarm
@@ -262,7 +260,6 @@ kernel/proc.c
 ## Codigo:
 ```c
 // Em allocproc(void):
-  // ADICIONAR INICIALIZAÇÃO DOS CAMPOS DO ALARM:
   p->alarm_interval = 0;
   p->alarm_handler = 0;
   p->alarm_ticks = 0;
@@ -270,7 +267,6 @@ kernel/proc.c
   p->alarm_active = 0;
 
 // Em freeproc(struct proc *p):
-  // ADICIONAR LIMPEZA DOS CAMPOS DO ALARM:
   if(p->alarm_trapframe)
     kfree((void*)p->alarm_trapframe);
   p->alarm_trapframe = 0;
@@ -291,7 +287,7 @@ kernel/trap.c
 ## Codigo:
 ```c
 if(which_dev == 2){
-    // ADICIONAR LÓGICA DO ALARM AQUI:
+    // ADICIONAR LÓGICA DO ALARM:
     struct proc *p = myproc();
     
     if(p->alarm_interval > 0) {

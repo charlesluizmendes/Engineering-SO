@@ -27,7 +27,7 @@ kernel/file.h
 
 ## Codigo:
 ```c
-uint addrs[NDIRECT + 2]; // idem ao dinode
+uint addrs[NDIRECT + 2];
 ```
 ## Explicação:
 Garante que a estrutura equivalente em memória tenha o mesmo layout de endereços do `dinode` no disco (`NDIRECT` diretos + 2 entradas extras para indireto simples e duplamente indireto).
@@ -58,7 +58,7 @@ bmap(struct inode *ip, uint bn)
   // indireto simples
   bn -= NDIRECT;
   if(bn < NINDIRECT){
-    // aloca bloco indireto, se preciso
+    // aloca bloco indireto
     if((addr = ip->addrs[SINDIRECT]) == 0){
       addr = balloc(ip->dev);
       ip->addrs[SINDIRECT] = addr;
@@ -77,7 +77,7 @@ bmap(struct inode *ip, uint bn)
   // duplamente indireto
   bn -= NINDIRECT;
   if(bn < NINDIRECT * NINDIRECT){
-    // aloca bloco duplamente indireto, se preciso
+    // aloca bloco duplamente indireto
     if((addr = ip->addrs[DINDIRECT]) == 0){
       addr = balloc(ip->dev);
       ip->addrs[DINDIRECT] = addr;
@@ -96,7 +96,7 @@ bmap(struct inode *ip, uint bn)
     uint addr_ind = a[i1];
     brelse(bp);
 
-    // 2º nível: bloco indireto tradicional que aponta para dados
+    // 2 nível: bloco indireto tradicional que aponta para dados
     bp2 = bread(ip->dev, addr_ind);
     a = (uint*)bp2->data;
     if(a[i2] == 0){
@@ -144,7 +144,7 @@ itrunc(struct inode *ip)
     a = (uint*)bp->data;
     for(int i = 0; i < NINDIRECT; i++){
       if(a[i]){
-        // liberar lista do indireto de 2º nível
+        // liberar lista do indireto de 2 nível
         bp2 = bread(ip->dev, a[i]);
         uint *b = (uint*)bp2->data;
         for(int j = 0; j < NINDIRECT; j++){

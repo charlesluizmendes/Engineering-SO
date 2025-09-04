@@ -3,9 +3,9 @@ kernel/defs.h
 
 ## Codigo:
 ```c
-void            vmprint(pagetable_t);  // ADICIONAR ESTA LINHA
+void            vmprint(pagetable_t);
 
-void            superinit(void);  // ADICIONAR
+void            superinit(void);
 void*           superalloc(void);
 void            superfree(void*);
 
@@ -43,13 +43,12 @@ superinit()
   initlock(&supermem.lock, "supermem");
   supermem.count = 0;
   
-  // Começar bem longe do fim do kernel
   uint64 start = PGROUNDUP((uint64)end);
   start += 64 * PGSIZE;  
   
   uint64 aligned = (start + SUPERPAGE_SIZE - 1) & ~(SUPERPAGE_SIZE - 1);
   
-  if(aligned + 8 * SUPERPAGE_SIZE > PHYSTOP){  // Aumentar para 8
+  if(aligned + 8 * SUPERPAGE_SIZE > PHYSTOP){ 
     printf("superinit: not enough memory for superpages
 ");
     return;
@@ -157,14 +156,12 @@ kernel/proc.c
 ```
 
 ```c
-// ADICIONAR: free USYSCALL page
   if(p->usyscall)
     kfree((void*)p->usyscall);
   p->usyscall = 0;
 ```
 
 ```c
-// ADICIONAR: map the USYSCALL page
   if(mappages(pagetable, USYSCALL, PGSIZE,
               (uint64)(p->usyscall), PTE_R | PTE_U) < 0){
     uvmunmap(pagetable, TRAMPOLINE, 1, 0);
@@ -175,11 +172,10 @@ kernel/proc.c
 ```
 
 ```c
-  uvmunmap(pagetable, USYSCALL, 1, 0);  // ADICIONAR ESTA LINHA
+  uvmunmap(pagetable, USYSCALL, 1, 0);
 ```
 
 ```c
-// Função para crescer processo usando superpages
 int
 growproc_super(int n)
 {
@@ -190,7 +186,6 @@ growproc_super(int n)
   if(n > 0){
     newsz = sz + n;
     
-    // Usar nossa função especializada
     if((newsz = uvmalloc_super(p->pagetable, sz, newsz)) == 0) {
       return -1;
     }
@@ -330,7 +325,7 @@ kernel/proc.h
 
 ## Codigo:
 ```c
-  struct usyscall *usyscall;   // ADICIONAR ESTA LINHA - data page for syscall speedup
+  struct usyscall *usyscall;
 ```
 ## Explicação:
 Campo no `struct proc` para apontar para a página **USYSCALL** do processo.
@@ -680,11 +675,8 @@ map_superpage(pagetable_t pagetable, uint64 va, uint64 pa, int perm)
   if(va % SUPERPAGE_SIZE != 0 || pa % SUPERPAGE_SIZE != 0)
     return -1;
 
-  // NÃO usar walk() que pode criar page tables
-  // Vamos acessar diretamente o nível 1
-  pte_t *pte_l2 = &pagetable[PX(2, va)];  // Nível 2
+  pte_t *pte_l2 = &pagetable[PX(2, va)];
   if(!(*pte_l2 & PTE_V)) {
-    // Precisa criar nível 1
     pagetable_t l1_table = (pagetable_t)kalloc();
     if(l1_table == 0)
       return -1;
@@ -692,7 +684,6 @@ map_superpage(pagetable_t pagetable, uint64 va, uint64 pa, int perm)
     *pte_l2 = PA2PTE(l1_table) | PTE_V;
   }
   
-  // Agora acessar nível 1 diretamente
   pagetable_t l1_table = (pagetable_t)PTE2PA(*pte_l2);
   pte = &l1_table[PX(1, va)];
   
